@@ -70,9 +70,11 @@ float EtaCuts[] = {-1.5, 1.5};
 double pt_intervals[6] = {0.15, 0.75, 1.2, 1.55, 2., 3.};
 double eta_intervals[10] = {-1.5, -1.2, -1., -0.6, -0.2, 0.2, 0.6, 1., 1.2, 1.5};
 
-double phiCenter[12][31][2];
-double deltaPhi = (30.0/180.0)*TMath::Pi();
-StRefMultCorr *refmultCorrUtil;
+
+double const mZDCSMDCenterex = 0;
+double const mZDCSMDCenterey = 0;
+double const mZDCSMDCenterwx = 0;
+double const mZDCSMDCenterwy = 0;
 
 
 
@@ -171,40 +173,6 @@ Int_t StKFParticleAnalysisMaker::Init()
   }
   f->cd(); 
   
-    
-  int ew = 0;//east
-
-   for(int pp=1; pp<13; pp++){
-        double phiPpCenter = TMath::Pi()/2.0 - (pp-0.5)*deltaPhi;
-        if(phiPpCenter<0.0) phiPpCenter += 2.0*TMath::Pi();
-        phiCenter[pp-1][0][ew] = phiPpCenter;
-
-        for(int tt=2; tt<32; tt+=2){
-                phiCenter[pp-1][tt-1][ew] = phiPpCenter - deltaPhi/4.0;
-        }
-
-        for(int tt=3; tt<32; tt+=2){
-                phiCenter[pp-1][tt-1][ew] = phiPpCenter + deltaPhi/4.0;
-        }
-   }
-
-   ew = 1;//west 5.89049
-
-
-   for(int pp=1; pp<13; pp++){
-        double phiPpCenter = TMath::Pi()/2.0 + (pp-0.5)*deltaPhi;
-        if(phiPpCenter>2.0*TMath::Pi()) phiPpCenter -= 2.0*TMath::Pi();
-        phiCenter[pp-1][0][ew] = phiPpCenter;
-
-        for(int tt=2; tt<32; tt+=2){
-                phiCenter[pp-1][tt-1][ew] = phiPpCenter + deltaPhi/4.0;
-        }
-        for(int tt=3; tt<32; tt+=2){
-                phiCenter[pp-1][tt-1][ew] = phiPpCenter - deltaPhi/4.0;
-        }
-
-  }
-
   for(int iSub=0; iSub!=nSub; iSub++){
     QWeight_1[nSub] = 0.;
     QWeight_2[nSub] = 0.;
@@ -228,7 +196,7 @@ Int_t StKFParticleAnalysisMaker::Init()
 
   isFileRead = true;
 
-  refmultCorrUtil = CentralityMaker::instance()->getRefMultCorr() ;
+  refmultCorrUtil = CentralityMaker::instance()->getgRefMultCorr_Run16_AuAu200_VpdMB5_P16ij() ;
  
   cout << "HERE WE'VE DONE WITH INIT!!! " << endl;
   if(fTMVAselection || fStoreTmvaNTuples)
@@ -613,17 +581,17 @@ Int_t StKFParticleAnalysisMaker::Make()
   //cout << "Done event " << mEventsDone << endl;
   
   if (EventCut(myEvent) == false) return kStOk;   
-   
   
   //mTrgEff = 1;
-  cout << "Done event " << mEventsDone << endl;
-  refmultCorrUtil -> init(myEvent->runId());
-  refmultCorrUtil -> initEvent(myEvent->refMult(), myEvent->primaryVertex().z(), myEvent->ZDCx());
-  Bool_t isBadRun = refmultCorrUtil->isBadRun(myEvent->runId()); //reject bad runs
-  Bool_t isPileUpEvt = !refmultCorrUtil->passnTofMatchRefmultCut(1.*myEvent->refMult(), 1.*myEvent->nBTOFMatch()); //reject pileup events
+  
+  refmultCorrUtil -> init(event->runId());
+  refmultCorrUtil -> initEvent(event->grefMult(), event->primaryVertex().z(), event->ZDCx());
+  Bool_t isBadRun = refmultCorrUtil-> isBadRun(event->runId()); //reject bad runs
 
   int cent = refmultCorrUtil->getCentralityBin9() ;
-  if (cent < 0 || isBadRun  || isPileUpEvt) return kStOk;
+  if (cent < 0 || isBadRun) return kStOk;
+
+  cout << "Done event " << mEventsDone << endl;
 
   for(int iSub=0; iSub!=nSub; iSub++){
     Qvec_1[2*iSub] = 0.;
@@ -632,7 +600,8 @@ Int_t StKFParticleAnalysisMaker::Make()
     Qvec_2[2*iSub+1] = 0.;
     Qvec_3[2*iSub] = 0.;
     Qvec_3[2*iSub+1] = 0.;
-    QWeight_1[iSub] = 0.;
+    QWeight_1[2*iSub] = 0.;
+    QWeight_1[2*iSub+1] = 0.;
     QWeight_2[iSub] = 0.;
     Psi1[iSub] = 0.;
     Psi2[iSub] = 0.;
@@ -664,50 +633,33 @@ Int_t StKFParticleAnalysisMaker::Make()
 
   }//for (int i = 0; i < nPicoTracks; ++i)
 
-  //EPD analisys
-  Int_t nEpdHits = fPicoDst->numberOfEpdHits();
+  //.........................................................Qvec by ZDC calc..............................................................
+  for( int iep=0; iep<2; iep++ ){ // east-west
 
-  //EPD loop
-  for(int iEpd=0; iEpd<nEpdHits; iEpd++){
-    //Retrieve ith EPDHit
-    StPicoEpdHit* femtoEpdHit = (StPicoEpdHit*)fPicoDst->epdHit(iEpd);
+    int nstrip;
+    for( int ixy=0; ixy<2; ixy++ ){
+      if( ixy==0 ) nstrip = 8; // vertical strips (7 in x-direction)
+      else         nstrip = 9; // horizontal strips (8 in y-direction)
+      for( int is=1; is<nstrip; is++ ){
+        Float_t zdc_adc = ZDCSMD( event, iep, ixy, is );
 
-    if(!femtoEpdHit->isGood()) continue;
+        if( zdc_adc<0 ) zdc_adc = 0;
 
-    PP = femtoEpdHit->position();
-    TT = femtoEpdHit->tile();
-    EW = femtoEpdHit->side();
-    w = femtoEpdHit->nMIP();
-    row = femtoEpdHit->row();
+        Qvec_1[2*iep + ixy]   += ZDCSMD_GetPosition( iep, ixy, is ) * zdc_adc;
+        QWeight_1[2*iep + ixy] += zdc_adc;
+      }
 
-    double wEff_EPD = w;
-    if(wEff_EPD<0.3) continue;
-    if(wEff_EPD>3) wEff_EPD = 3;
-
-    if(EW == 1){
-
-      wEff_EPD *= fabs(v1_average[cent][0]->GetBinContent(row));
-      Qvec_1[0] += wEff_EPD*TMath::Cos(phiCenter[PP-1][TT-1][EW]);
-      Qvec_1[1] += wEff_EPD*TMath::Sin(phiCenter[PP-1][TT-1][EW]);
-      QWeight_1[0] += wEff_EPD;
-      
-    }
-
-    if(EW==-1){
-      wEff_EPD *= fabs(v1_average[cent][1]->GetBinContent(row));
-      Qvec_1[2] += wEff_EPD*TMath::Cos(phiCenter[PP-1][TT-1][0]);
-      Qvec_1[3] += wEff_EPD*TMath::Sin(phiCenter[PP-1][TT-1][0]);
-      QWeight_1[1] += wEff_EPD;
-      
     }
   }
+  
 
     
 
   //.........................................start of RP calculation.....................................
   bool check = true;
   for(int iSub=0; iSub!=nSub-1; iSub++){
-    if(QWeight_1[iSub] == 0) check = false;
+    if(QWeight_1[2*iSub] == 0) check = false;
+    if(QWeight_1[2*iSub+1] == 0) check = false;
     if(QWeight_2[iSub] == 0) check = false;
   }
   if(!check) return kStOk;
@@ -715,8 +667,8 @@ Int_t StKFParticleAnalysisMaker::Make()
   //Get Q vectors
   
   for(int iSub=0; iSub!=nSub-1; iSub++){
-    Qvec_1[2*iSub] = Qvec_1[2*iSub]/QWeight_1[iSub];
-    Qvec_1[2*iSub+1] = Qvec_1[2*iSub+1]/QWeight_1[iSub];
+    Qvec_1[2*iSub] = Qvec_1[2*iSub]/QWeight_1[2*iSub];
+    Qvec_1[2*iSub+1] = Qvec_1[2*iSub+1]/QWeight_1[2*iSub+1];
     if(fabs(Qvec_1[2*iSub])>999 || fabs(Qvec_1[2*iSub+1])>999) check = false;
 
     Qvec_2[2*iSub] = Qvec_2[2*iSub]/QWeight_2[iSub];
@@ -732,8 +684,8 @@ Int_t StKFParticleAnalysisMaker::Make()
   Qvec_1[5] = Qvec_1[1] - Qvec_1[3];
   Qvec_2[4] = Qvec_2[0] + Qvec_2[2];
   Qvec_2[5] = Qvec_2[1] + Qvec_2[3];
-  Qvec_3[4] = Qvec_3[0] - Qvec_3[2];
-  Qvec_3[5] = Qvec_3[1] - Qvec_3[3];
+  Qvec_3[4] = Qvec_3[0] + Qvec_3[2];
+  Qvec_3[5] = Qvec_3[1] + Qvec_3[3];
 
    
   //Recentering
@@ -1239,10 +1191,24 @@ bool StKFParticleAnalysisMaker::GoodRun(StPicoEvent* event) { //19.6 Preliminary
 bool StKFParticleAnalysisMaker::EventCut(StPicoEvent *event)
 {
   bool cut = true;
-  if (!event->isTrigger(650000) && !event->isTrigger(650001) && !event->isTrigger(650002) && !event->isTrigger(650003) &&
-      !event->isTrigger(650007) && !event->isTrigger(650004) && !event->isTrigger(650005) && !event->isTrigger(650006) &&
-      !event->isTrigger(650009) ) cut = false;
-  if (event->primaryVertex().Z() < -145. || event->primaryVertex().Z() > 145. || ( pow(event->primaryVertex().X(),2) + pow(event->primaryVertex().Y(),2) > 4)) cut = false;
+  double vz = event->primaryVertex().Z(), vx = event->primaryVertex().X(), vy = event->primaryVertex().Y();
+  double grefMult = event->grefMult(), tofMult = event->btofTrayMultiplicity();
+  double vx_ave, vy_ave;
+
+  if (fabs(vz) > 6. || fabs(vz-event->vzVpd()) > 3.) cut = false;
+  if(fabs(vx)<1.e-5 && fabs(vy)<1.e-5 && fabs(vz)<1.e-5) cut = false;
+
+  vx_ave = -0.205;
+  vy_ave = -0.177;
+  if (!event->isTrigger(520001) && !event->isTrigger(520011) && !event->isTrigger(520021) && !event->isTrigger(520031) &&
+      !event->isTrigger(520041) && !event->isTrigger(520051)) cut = false;   
+  if( tofMult<(-200+3.5*grefMult) ) cut = false;
+  if( tofMult>( 180+5.8*grefMult) ) cut = false;
+
+  double vxc = vx - vx_ave;
+  double vyc = vy - vy_ave;
+
+  if(( vxc*vxc + vyc*vyc) > 4) cut = false;
 //  if (!GoodRun(event))  cut = false;
   return cut;
 
@@ -1250,10 +1216,6 @@ bool StKFParticleAnalysisMaker::EventCut(StPicoEvent *event)
 
 }
 
-
-void StKFParticleAnalysisMaker::SetMyStuff(Char_t *outFileName, Char_t *runFileName) {
-foutFile = outFileName; frunFile = runFileName;	
-}
 
 bool StKFParticleAnalysisMaker::PrithwishRun(StPicoEvent *event) {
         int Run = event->runId();
@@ -1340,10 +1302,10 @@ void StKFParticleAnalysisMaker::CreateEPDist() {
   CosOfDiff_3 = new TProfile("CosOfDiff_3", "CosOfDiff for Psi_3", 9, 0, 9);
 
   for(int iCent=0; iCent!=9; iCent++){
-    Qvec1Hist[iCent][0]->SetTitle(Form("Qx West EPD first harm (%i)", iCent));
-    Qvec1Hist[iCent][1]->SetTitle(Form("Qy West EPD first harm (%i)", iCent));
-    Qvec1Hist[iCent][2]->SetTitle(Form("Qx East EPD first harm (%i)", iCent));
-    Qvec1Hist[iCent][3]->SetTitle(Form("Qy East EPD first harm (%i)", iCent));
+    Qvec1Hist[iCent][0]->SetTitle(Form("Qx East EPD first harm (%i)", iCent));
+    Qvec1Hist[iCent][1]->SetTitle(Form("Qy East EPD first harm (%i)", iCent));
+    Qvec1Hist[iCent][2]->SetTitle(Form("Qx West EPD first harm (%i)", iCent));
+    Qvec1Hist[iCent][3]->SetTitle(Form("Qy West EPD first harm (%i)", iCent));
     Qvec1Hist[iCent][4]->SetTitle(Form("Qx Comb EPD first harm (%i)", iCent));
     Qvec1Hist[iCent][5]->SetTitle(Form("Qy Comb EPD first harm (%i)", iCent));
 
@@ -1361,8 +1323,8 @@ void StKFParticleAnalysisMaker::CreateEPDist() {
     Qvec3Hist[iCent][4]->SetTitle(Form("Qx Comb TPC third harm (%i)", iCent));
     Qvec3Hist[iCent][5]->SetTitle(Form("Qy Comb TPC third harm (%i)", iCent));
 
-    Psi1Hist[iCent][0]->SetTitle(Form("West Psi_1 EPD (%i)", iCent));
-    Psi1Hist[iCent][1]->SetTitle(Form("East Psi_1 EPD (%i)", iCent));
+    Psi1Hist[iCent][0]->SetTitle(Form("East Psi_1 EPD (%i)", iCent));
+    Psi1Hist[iCent][1]->SetTitle(Form("West Psi_1 EPD (%i)", iCent));
     Psi1Hist[iCent][2]->SetTitle(Form("Comb Psi_1 EPD (%i)", iCent));
     
     Psi2Hist[iCent][0]->SetTitle(Form("West Psi_2 TPC (%i)", iCent));
@@ -1467,6 +1429,35 @@ void StKFParticleAnalysisMaker::CreateKFPHists() {
 }
 
 
+Float_t StKFParticleAnalysisMaker::ZDCSMD( StPicoEvent *pEv, int eastwest, int verthori, int strip ) {
+
+        float val = 0;
+        
+        if     ( eastwest==0 && verthori==0 ) val = pEv->ZdcSmdEastVertical  (strip-1);
+        else if( eastwest==0 && verthori==1 ) val = pEv->ZdcSmdEastHorizontal(strip-1);
+        else if( eastwest==1 && verthori==0 ) val = pEv->ZdcSmdWestVertical  (strip-1);
+        else if( eastwest==1 && verthori==1 ) val = pEv->ZdcSmdWestHorizontal(strip-1);
+
+        
+        return val;
+}
+
+
+Float_t StKFParticleAnalysisMaker::ZDCSMD_GetPosition( int eastwest, int verthori, int strip ) {
+// Get position of each slat;strip starts from 1
+
+        Float_t zdcsmd_x[7] = {0.5,2,3.5,5,6.5,8,9.5};
+        Float_t zdcsmd_y[8] = {1.25,3.25,5.25,7.25,9.25,11.25,13.25,15.25};
+
+        if(eastwest==0 && verthori==0) return zdcsmd_x[strip-1]-mZDCSMDCenterex;
+        if(eastwest==1 && verthori==0) return mZDCSMDCenterwx-zdcsmd_x[strip-1];
+        if(eastwest==0 && verthori==1) return zdcsmd_y[strip-1]/sqrt(2.)-mZDCSMDCenterey;
+        if(eastwest==1 && verthori==1) return zdcsmd_y[strip-1]/sqrt(2.)-mZDCSMDCenterwy;
+
+  return 0;
+}
+
+
 double StKFParticleAnalysisMaker::GetPsi(int iOrd, double Qx, double Qy){
     double Psi;
     Psi = atan2(Qy, Qx)/iOrd;
@@ -1503,13 +1494,3 @@ void StKFParticleAnalysisMaker::GetFlattening() {
   }
 }
 
-void StKFParticleAnalysisMaker::GetWeightCorr() {
-  TFile *file = new TFile("/star/u/mmorozov/14p5MakeCorrections/correctionsEP_output/outputV1.root", "read");
-
-  for(int iCent=0; iCent!=9; iCent++){
-    for(int iSub=0; iSub!=2; iSub++){
-      v1_average[iCent][iSub] = (TProfile*)file->Get(Form("v1_average_%i_%i", iCent, iSub));
-    }
-        
-  }
-}

@@ -105,16 +105,16 @@ class StKFParticleAnalysisMaker : public StMaker {
   void InitEpFinders();
 
   //My variables
+  StRefMultCorr *refmultCorrUtil;
   const Char_t *runnumber;
-  double QWeight_1[nSub], QWeight_2[nSub];
+  double QWeight_1[2*nSub], QWeight_2[nSub];
   double Qvec_1[2*nSub], Qvec_2[2*nSub], Qvec_3[2*nSub];
   double Psi1[nSub], Psi2[nSub], Psi3[nSub];
   double deltaPsi1[nSub], deltaPsi2[nSub], deltaPsi3[nSub];
-  int PP, TT, EW, iPsi, iSide, row, phi_bin;
+  int iPsi, iSide, phi_bin;
   double sin_diffPsi1Phi, cos_diffPsi1Phi, delta_phi;
   
   //My hist
-  TProfile *v1_average[9][2];
 
   TH1F *Coef_A_n_TH_Psi1[10][nSub];
   TH1F *Coef_B_n_TH_Psi1[10][nSub];
@@ -176,8 +176,9 @@ class StKFParticleAnalysisMaker : public StMaker {
   //Its My Functions MAXIM
   void CreateEPDist();
   void CreateKFPHists();
+  Float_t ZDCSMD( StPicoEvent *pEv, int eastwest, int verthori, int strip );
+  Float_t ZDCSMD_GetPosition( int eastwest, int verthori, int strip );
   void GetCentring();
-  void GetWeightCorr();
   void GetFlattening();
   double GetPsi(int iOrd, double Qx, double Qy);
   
@@ -191,7 +192,6 @@ class StKFParticleAnalysisMaker : public StMaker {
   virtual Int_t  Init();
   virtual Int_t  InitRun(Int_t runumber);
   void           BookVertexPlots();
-  void SetMyStuff(Char_t *outFileName, Char_t *runFileName);
   virtual Int_t  Make();
   virtual Int_t  Finish();
   Bool_t         Check();
