@@ -650,7 +650,7 @@ bool StKFParticleInterface::ProcessEvent(StPicoDst* picoDst, std::vector<int>& t
     if (! gTrack->charge())  continue;
     if (  gTrack->nHitsFit() < 15) continue;
     if (  gTrack->dEdxError() < 0.04 || gTrack->dEdxError() > 0.12 ) continue;
-    if ( fabs(gTrack->gMom().Eta()) > 1.5 || gTrack->gMom().Mag()<0.15) continue; //MY CHANGE! EGOR! DONT FORGET!!!!!
+    if ( fabs(gTrack->gMom().Eta()) > 1. || gTrack->gPt()<0.15 || gTrack->gPt()>5.) continue; //MY CHANGE! EGOR! DONT FORGET!!!!!
     if ((Float_t)gTrack->nHits()/gTrack->nHitsPoss() < 0.52 ) continue; //MY CHANGE! EGOR! DONT FORGET!!!!!
     //if ( gTrack->nHits() < 12) continue;
     const int index = gTrack->id();

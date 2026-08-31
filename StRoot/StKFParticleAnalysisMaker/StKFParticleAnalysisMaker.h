@@ -25,6 +25,10 @@
 #include "StPicoEvent/StPicoTrack.h"
 #include "StPicoEvent/StPicoEpdHit.h"
 
+
+const int eta_bins = 9;
+const int pt_bins = 8;
+
 const int PolPartNum = 12;
 const int DetNum = 3;
 const int nSub = 3;//Numbers of Psi
@@ -111,8 +115,9 @@ class StKFParticleAnalysisMaker : public StMaker {
   double Qvec_1[2*nSub], Qvec_2[2*nSub], Qvec_3[2*nSub];
   double Psi1[nSub], Psi2[nSub], Psi3[nSub];
   double deltaPsi1[nSub], deltaPsi2[nSub], deltaPsi3[nSub];
-  int iPsi, iSide, phi_bin;
+  int iPsi, iSide, phi_bin, pt_bin, eta_bin;
   double sin_diffPsi1Phi, cos_diffPsi1Phi, delta_phi;
+
   
   //My hist
 
@@ -155,6 +160,37 @@ class StKFParticleAnalysisMaker : public StMaker {
 
   TH1F *InvMLamDist[9][6][4];
   TH1F *InvMLamBarDist[9][6][4];
+
+  //For Polar Vs pt
+  TProfile *prSin_diffPhiPsi1_forPt[9][6][pt_bins][4];
+  TProfile *prCos_diffPhiPsi1_forPt[9][6][pt_bins][4];
+  TProfile *prCos_theta_forPt[9][6][pt_bins][4];
+
+  TProfile *prSin_diffPhiPsi1_forPt_LamBar[9][6][pt_bins][4];
+  TProfile *prCos_diffPhiPsi1_forPt_LamBar[9][6][pt_bins][4];
+  TProfile *prCos_theta_forPt_LamBar[9][6][pt_bins][4];
+
+  TH1F *InvMLamDist_forPt[9][6][pt_bins][4];
+  TH1F *InvMLamBarDist_forPt[9][6][pt_bins][4];
+
+  TProfile *prCos2_theta_forPt[pt_bins];
+  TProfile *prCos2_theta_forPt_LamBar[pt_bins];
+
+  //For Polar Vs eta
+  TProfile *prSin_diffPhiPsi1_forEta[9][6][eta_bins][4];
+  TProfile *prCos_diffPhiPsi1_forEta[9][6][eta_bins][4];
+  TProfile *prCos_theta_forEta[9][6][eta_bins][4];
+
+  TProfile *prSin_diffPhiPsi1_forEta_LamBar[9][6][eta_bins][4];
+  TProfile *prCos_diffPhiPsi1_forEta_LamBar[9][6][eta_bins][4];
+  TProfile *prCos_theta_forEta_LamBar[9][6][eta_bins][4];
+
+  TH1F *InvMLamDist_forEta[9][6][eta_bins][4];
+  TH1F *InvMLamBarDist_forEta[9][6][eta_bins][4];
+
+  TProfile *prCos2_theta_forEta[eta_bins];
+  TProfile *prCos2_theta_forEta_LamBar[eta_bins];
+
 
   StEpdEpFinder *etaFinder;
   StEpdEpFinder *etaVzFinder[14];
