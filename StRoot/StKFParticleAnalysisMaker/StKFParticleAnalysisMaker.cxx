@@ -190,7 +190,6 @@ Int_t StKFParticleAnalysisMaker::Init()
 
   CreateEPDist();
   CreateKFPHists();
-  GetWeightCorr();
   GetCentring();
   GetFlattening();
 
@@ -584,9 +583,9 @@ Int_t StKFParticleAnalysisMaker::Make()
   
   //mTrgEff = 1;
   
-  refmultCorrUtil -> init(event->runId());
-  refmultCorrUtil -> initEvent(event->grefMult(), event->primaryVertex().z(), event->ZDCx());
-  Bool_t isBadRun = refmultCorrUtil-> isBadRun(event->runId()); //reject bad runs
+  refmultCorrUtil -> init(myEvent->runId());
+  refmultCorrUtil -> initEvent(myEvent->grefMult(), myEvent->primaryVertex().z(), myEvent->ZDCx());
+  Bool_t isBadRun = refmultCorrUtil-> isBadRun(myEvent->runId()); //reject bad runs
 
   int cent = refmultCorrUtil->getCentralityBin9() ;
   if (cent < 0 || isBadRun) return kStOk;
@@ -641,7 +640,7 @@ Int_t StKFParticleAnalysisMaker::Make()
       if( ixy==0 ) nstrip = 8; // vertical strips (7 in x-direction)
       else         nstrip = 9; // horizontal strips (8 in y-direction)
       for( int is=1; is<nstrip; is++ ){
-        Float_t zdc_adc = ZDCSMD( event, iep, ixy, is );
+        Float_t zdc_adc = ZDCSMD( myEvent, iep, ixy, is );
 
         if( zdc_adc<0 ) zdc_adc = 0;
 
