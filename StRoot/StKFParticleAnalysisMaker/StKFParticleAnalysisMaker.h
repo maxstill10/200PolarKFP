@@ -147,14 +147,12 @@ class StKFParticleAnalysisMaker : public StMaker {
   TProfile *prSin_diffPhiPsi1[9][6][4];
   TProfile *prCos_diffPhiPsi1[9][6][4];
   TProfile *prCos_theta[9][6][4];
-  TProfile *prSin_theta[9][6][4];
   TProfile *prSin_diffPhiPsi1Sin_theta[9][6][4];
   TProfile *prCos_diffPhiPsi1Sin_theta[9][6][4];
 
   TProfile *prSin_diffPhiPsi1_LamBar[9][6][4];
   TProfile *prCos_diffPhiPsi1_LamBar[9][6][4];
   TProfile *prCos_theta_LamBar[9][6][4];
-  TProfile *prSin_theta_LamBar[9][6][4];
   TProfile *prSin_diffPhiPsi1Sin_theta_LamBar[9][6][4];
   TProfile *prCos_diffPhiPsi1Sin_theta_LamBar[9][6][4];
 
@@ -162,31 +160,31 @@ class StKFParticleAnalysisMaker : public StMaker {
   TH1F *InvMLamBarDist[9][6][4];
 
   //For Polar Vs pt
-  TProfile *prSin_diffPhiPsi1_forPt[9][6][pt_bins][4];
-  TProfile *prCos_diffPhiPsi1_forPt[9][6][pt_bins][4];
-  TProfile *prCos_theta_forPt[9][6][pt_bins][4];
+  TProfile *prSin_diffPhiPsi1_forPt[9][pt_bins][2];
+  TProfile *prCos_diffPhiPsi1_forPt[9][pt_bins][2];
+  TProfile *prCos_theta_forPt[9][pt_bins][2];
 
-  TProfile *prSin_diffPhiPsi1_forPt_LamBar[9][6][pt_bins][4];
-  TProfile *prCos_diffPhiPsi1_forPt_LamBar[9][6][pt_bins][4];
-  TProfile *prCos_theta_forPt_LamBar[9][6][pt_bins][4];
+  TProfile *prSin_diffPhiPsi1_forPt_LamBar[9][pt_bins][2];
+  TProfile *prCos_diffPhiPsi1_forPt_LamBar[9][pt_bins][2];
+  TProfile *prCos_theta_forPt_LamBar[9][pt_bins][2];
 
-  TH1F *InvMLamDist_forPt[9][6][pt_bins][4];
-  TH1F *InvMLamBarDist_forPt[9][6][pt_bins][4];
+  TH1F *InvMLamDist_forPt[9][pt_bins][2];
+  TH1F *InvMLamBarDist_forPt[9][pt_bins][2];
 
   TProfile *prCos2_theta_forPt[pt_bins];
   TProfile *prCos2_theta_forPt_LamBar[pt_bins];
 
   //For Polar Vs eta
-  TProfile *prSin_diffPhiPsi1_forEta[9][6][eta_bins][4];
-  TProfile *prCos_diffPhiPsi1_forEta[9][6][eta_bins][4];
-  TProfile *prCos_theta_forEta[9][6][eta_bins][4];
+  TProfile *prSin_diffPhiPsi1_forEta[9][eta_bins][2];
+  TProfile *prCos_diffPhiPsi1_forEta[9][eta_bins][2];
+  TProfile *prCos_theta_forEta[9][eta_bins][2];
 
-  TProfile *prSin_diffPhiPsi1_forEta_LamBar[9][6][eta_bins][4];
-  TProfile *prCos_diffPhiPsi1_forEta_LamBar[9][6][eta_bins][4];
-  TProfile *prCos_theta_forEta_LamBar[9][6][eta_bins][4];
+  TProfile *prSin_diffPhiPsi1_forEta_LamBar[9][eta_bins][2];
+  TProfile *prCos_diffPhiPsi1_forEta_LamBar[9][eta_bins][2];
+  TProfile *prCos_theta_forEta_LamBar[9][eta_bins][2];
 
-  TH1F *InvMLamDist_forEta[9][6][eta_bins][4];
-  TH1F *InvMLamBarDist_forEta[9][6][eta_bins][4];
+  TH1F *InvMLamDist_forEta[9][eta_bins][2];
+  TH1F *InvMLamBarDist_forEta[9][eta_bins][2];
 
   TProfile *prCos2_theta_forEta[eta_bins];
   TProfile *prCos2_theta_forEta_LamBar[eta_bins];
