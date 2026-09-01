@@ -40,8 +40,8 @@ void removeValuesFromFile(const Char_t *filename)
 }
 
 
-void analysis(Char_t *inFileName = "../inputfiles/st_physics_17039044_raw_2500012.picoDst.root" ,// "/star/u/alpatov/KFParticle/st_physics_19142027_raw_2500009.picoDst.root",
-Char_t *outFileName = "pico.root", const Char_t *runId = "22158015", Char_t *runFile = "095", bool isPico = true)
+void analysis(Char_t *inFileName = "../inputfiles/st_physics_17040001_raw_5000009.picoDst.root" ,// "/star/u/alpatov/KFParticle/st_physics_19142027_raw_2500009.picoDst.root",
+Char_t *outFileName = "../outputFiles/pico.root", const Char_t *runId = "17040001", Char_t *runFile = "095", bool isPico = true)
 {
 #if !defined(__CINT__)
   std::cout << "This code cannot be compiled" << std::endl;

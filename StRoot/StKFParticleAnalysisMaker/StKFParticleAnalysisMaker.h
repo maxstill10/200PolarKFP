@@ -212,6 +212,7 @@ class StKFParticleAnalysisMaker : public StMaker {
   //Its My Functions MAXIM
   void CreateEPDist();
   void CreateKFPHists();
+  void CreateKFPHists_forPtandEta();
   Float_t ZDCSMD( StPicoEvent *pEv, int eastwest, int verthori, int strip );
   Float_t ZDCSMD_GetPosition( int eastwest, int verthori, int strip );
   void GetCentring();
