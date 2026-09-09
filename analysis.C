@@ -40,7 +40,7 @@ void removeValuesFromFile(const Char_t *filename)
 }
 
 
-void analysis(Char_t *inFileName = "../inputfiles/st_physics_17040001_raw_5000009.picoDst.root" ,// "/star/u/alpatov/KFParticle/st_physics_19142027_raw_2500009.picoDst.root",
+void analysis(Char_t *inFileName = "/star/data01/pwg/mmorozov/Polarization/inputfiles/st_physics_17111039_raw_4500028.picoDst.root" ,// "/star/u/alpatov/KFParticle/st_physics_19142027_raw_2500009.picoDst.root",
 Char_t *outFileName = "../outputFiles/pico.root", const Char_t *runId = "17040001", Char_t *runFile = "095", bool isPico = true)
 {
 #if !defined(__CINT__)

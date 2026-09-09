@@ -603,7 +603,7 @@ Int_t StKFParticleAnalysisMaker::Make()
     Psi3[iSub] = 0.;
   }
 
-
+cout<<"0000"<<endl;
   Int_t nPicoTracks = fPicoDst->numberOfTracks();
   
   for (int i = 0; i < nPicoTracks; ++i){
@@ -651,7 +651,7 @@ Int_t StKFParticleAnalysisMaker::Make()
     }
   }
   
-
+cout<<"1111"<<endl;
     
 
   //.........................................start of RP calculation.....................................
@@ -762,7 +762,7 @@ Int_t StKFParticleAnalysisMaker::Make()
 
   //.........................................end of RP calculation.....................................
   
-
+cout<<"2222"<<endl;
   //.........................................Pz calculating............................................
   for (int iParticle=0; iParticle<fStKFParticlePerformanceInterface->GetNReconstructedParticles(); iParticle++){
     KFParticle particle = fStKFParticleInterface->GetParticles()[iParticle];
@@ -800,7 +800,7 @@ Int_t StKFParticleAnalysisMaker::Make()
         TVector3 DaugVec(DaugParticle.GetPx(), DaugParticle.GetPy(), DaugParticle.GetPz());
 
         if(abs(DaugParticle.GetPDG())!=2212) continue;
-        
+cout<<"3333"<<endl;        
         TVector3 Lam_mom = ParentVec * (1/particle.GetE());
         TLorentzVector proton_mom(DaugVec, DaugParticle.GetE());
         proton_mom.Boost(-(Lam_mom));
@@ -814,7 +814,7 @@ Int_t StKFParticleAnalysisMaker::Make()
         cos_diffPsi1Phi = TMath::Cos(proton_mom.Phi() - Psi1[2]);
         
         //...........................Psi2 dependences research...................
-
+cout<<"pt_bin = "<<pt_bin<<"   eta_bin = "<<eta_bin<<endl;
         delta_phi = TMath::Pi()/6;
         //research related Psi_comb
         dphi = phi_Lam-Psi2[2];
@@ -843,7 +843,7 @@ Int_t StKFParticleAnalysisMaker::Make()
         prCos_theta_forEta[cent][eta_bin][1]->Fill(inv_m, proton_mom.CosTheta()*TMath::Sin(2*dphi));
 
         InvMLamDist_forEta[cent][eta_bin][1]->Fill(inv_m);
-
+cout<<"6666"<<endl;
         //research related Psi_e/w
         dphi = phi_Lam-Psi2[iPsi];
         while((dphi) < 0.) dphi+=TMath::Pi();
@@ -873,7 +873,7 @@ Int_t StKFParticleAnalysisMaker::Make()
         InvMLamDist_forEta[cent][eta_bin][0]->Fill(inv_m);
 
         //..................end of Psi2 dependences research.......................
-
+cout<<"7777"<<endl;
         //..................Psi3 dependences research.......................
         delta_phi = TMath::Pi()/9;
         //research related Psi_comb
@@ -941,7 +941,7 @@ Int_t StKFParticleAnalysisMaker::Make()
                           
       //Get daughters of AntiLambda hyperon
       for (const auto& elem : particle.DaughterIds()) {
-
+cout<<"4444"<<endl;
         if(elem<0) continue;
         KFParticle DaugParticle = fStKFParticleInterface->GetParticles()[elem];
         TVector3 DaugVec(DaugParticle.GetPx(), DaugParticle.GetPy(), DaugParticle.GetPz());

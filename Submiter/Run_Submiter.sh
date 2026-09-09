@@ -2,16 +2,13 @@
 
 FILE="run16_1_runnum.list"
 
-#6sem, Centred, Flatt
-mode="6sem"
-
 runnumbers=()
 
 while IFS= read -r line; do
    numbers+=("$line")   
 done < "$FILE"
 
-for number in "${numbers[@]}"; do
+for number in "${numbers[@]:1}"; do
     mkdir -p /star/data01/pwg/mmorozov/Polarization/200GeV/log/$number
     mkdir -p /star/data01/pwg/mmorozov/Polarization/200GeV/data/$number
     OutFile="submiter_$number.xml"
