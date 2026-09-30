@@ -27,7 +27,7 @@
 
 
 const int eta_bins = 9;
-const int pt_bins = 8;
+const int pt_bins = 7;
 
 const int PolPartNum = 12;
 const int DetNum = 3;
@@ -111,6 +111,7 @@ class StKFParticleAnalysisMaker : public StMaker {
   //My variables
   StRefMultCorr *refmultCorrUtil;
   const Char_t *runnumber;
+  const Char_t *mProd;
   double QWeight_1[2*nSub], QWeight_2[nSub];
   double Qvec_1[2*nSub], Qvec_2[2*nSub], Qvec_3[2*nSub];
   double Psi1[nSub], Psi2[nSub], Psi3[nSub];
@@ -121,6 +122,11 @@ class StKFParticleAnalysisMaker : public StMaker {
   
   //My hist
 
+  TH1F *hPt_kfp;
+  TH1F *hPtot_kfp;
+  TH1F *hEta_kfp;
+
+  //For EP reconstruction  
   TH1F *Coef_A_n_TH_Psi1[10][nSub];
   TH1F *Coef_B_n_TH_Psi1[10][nSub];
   TH1F *Coef_A_n_TH_Psi2[10][nSub];
@@ -162,9 +168,11 @@ class StKFParticleAnalysisMaker : public StMaker {
   //For Polar Vs pt
   TProfile *prSin_diffPhiPsi1_forPt[9][pt_bins][2];
   TProfile *prCos_diffPhiPsi1_forPt[9][pt_bins][2];
+  TProfile *prCos_dPhi1_Sin_dPhi2_forPt[9][pt_bins][2];
   TProfile *prCos_theta_forPt[9][pt_bins][2];
 
   TProfile *prSin_diffPhiPsi1_forPt_LamBar[9][pt_bins][2];
+  TProfile *prCos_dPhi1_Sin_dPhi2_forPt_LamBar[9][pt_bins][2];
   TProfile *prCos_diffPhiPsi1_forPt_LamBar[9][pt_bins][2];
   TProfile *prCos_theta_forPt_LamBar[9][pt_bins][2];
 
@@ -177,9 +185,11 @@ class StKFParticleAnalysisMaker : public StMaker {
   //For Polar Vs eta
   TProfile *prSin_diffPhiPsi1_forEta[9][eta_bins][2];
   TProfile *prCos_diffPhiPsi1_forEta[9][eta_bins][2];
+  TProfile *prCos_dPhi1_Sin_dPhi2_forEta[9][eta_bins][2];
   TProfile *prCos_theta_forEta[9][eta_bins][2];
 
   TProfile *prSin_diffPhiPsi1_forEta_LamBar[9][eta_bins][2];
+  TProfile *prCos_dPhi1_Sin_dPhi2_forEta_LamBar[9][eta_bins][2];
   TProfile *prCos_diffPhiPsi1_forEta_LamBar[9][eta_bins][2];
   TProfile *prCos_theta_forEta_LamBar[9][eta_bins][2];
 
@@ -210,7 +220,8 @@ class StKFParticleAnalysisMaker : public StMaker {
   //Its My Functions MAXIM
   void CreateEPDist();
   void CreateKFPHists();
-  void CreateKFPHists_forPtandEta();
+  void CreateKFPHists_forPt();
+  void CreateKFPHists_Eta();
   Float_t ZDCSMD( StPicoEvent *pEv, int eastwest, int verthori, int strip );
   Float_t ZDCSMD_GetPosition( int eastwest, int verthori, int strip );
   void GetCentring();
@@ -269,6 +280,7 @@ class StKFParticleAnalysisMaker : public StMaker {
 
   //Here will be my stuff
   void SetRunNumber(const Char_t *mrunnumber){ runnumber = mrunnumber; }
+  void SetNameOfProduction(const Char_t *ProdName){ mProd = ProdName; }
   
   ClassDef(StKFParticleAnalysisMaker,0)   //
 };
