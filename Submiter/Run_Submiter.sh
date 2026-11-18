@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILE="run16_1_runnum.list"
+FILE="auau200_run_16_1_runnum.list"
 
 runnumbers=()
 
@@ -31,7 +31,7 @@ for number in "${numbers[@]:1}"; do
     ln -s /star/u/mmorozov/200PolarKFP/lMuDst.C .
 
     source setupDEV2.csh
-    root -b -l -q analysis.C\(\"\$FILELIST\",\"\$JOBID.root\",\"$number\"\)
+    root -b -l -q analysis.C\(\"\$FILELIST\",\"\$JOBID.root\",\"$number\",\"run16_1\"\)
     
     </command>
 
