@@ -200,6 +200,7 @@ Int_t StKFParticleAnalysisMaker::Init()
 
   if(strcmp(mProd, "run14") == 0) refmultCorrUtil = CentralityMaker::instance()->getgRefMultCorr_Run14_AuAu200_VpdMB5_P16id() ;
   else if(strcmp(mProd, "run16_1") == 0) {refmultCorrUtil = CentralityMaker::instance()->getgRefMultCorr_Run16_AuAu200_VpdMB5_P16ij() ; }
+  else if(strcmp(mProd, "run16_2") == 0) {refmultCorrUtil = CentralityMaker::instance()->getgRefMultCorr_Run16_AuAu200_VpdMB5_P16ij() ; }
  
   cout << "HERE WE'VE DONE WITH INIT!!! " << endl;
   if(fTMVAselection || fStoreTmvaNTuples)
@@ -1349,6 +1350,21 @@ bool StKFParticleAnalysisMaker::EventCut(StPicoEvent *event)
     vy_ave = -0.177;
     if (!event->isTrigger(520001) && !event->isTrigger(520011) && !event->isTrigger(520021) && !event->isTrigger(520031) &&
         !event->isTrigger(520041) && !event->isTrigger(520051)) cut = false;
+    if( tofMult<(-200+3.5*grefMult) ) cut = false;
+    if( tofMult>( 180+5.8*grefMult) ) cut = false;
+
+    double vxc = vx - vx_ave;
+    double vyc = vy - vy_ave;
+
+    if(( vxc*vxc + vyc*vyc) > 4) cut = false;
+
+  }else if(strcmp(mProd, "run16_2") == 0){ //run16_prod2
+    if (fabs(vz) > 6. || fabs(vz-event->vzVpd()) > 3.) cut = false;
+  
+    vx_ave = -0.205;
+    vy_ave = -0.177;
+    if ( !event->isTrigger(570001) && !event->isTrigger(570002) ) cut = false;
+    if( event->nBTOFMatch()>(130.+0.75*grefMult) || event->nBTOFMatch()<(-20.+0.62*grefMult) ) cut = false;
     if( tofMult<(-200+3.5*grefMult) ) cut = false;
     if( tofMult>( 180+5.8*grefMult) ) cut = false;
 
